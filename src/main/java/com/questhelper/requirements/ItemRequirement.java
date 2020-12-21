@@ -43,6 +43,9 @@ public class ItemRequirement extends Requirement
 	@Getter
 	private final int id;
 
+	@Setter
+	private Integer displayItemId;
+
 	private final String name;
 
 	@Setter
@@ -83,7 +86,6 @@ public class ItemRequirement extends Requirement
 		this(name, id, quantity);
 		this.equip = equip;
 	}
-
 
 	public ItemRequirement(boolean highlightInInventory, String name, int id)
 	{
@@ -283,6 +285,35 @@ public class ItemRequirement extends Requirement
 	public boolean check(Client client)
 	{
 		return check(client, false);
+	}
+
+	public boolean checkBank(Client client)
+	{
+		ItemContainer bankContainer = client.getItemContainer(InventoryID.BANK);
+		if (bankContainer == null)
+		{
+			return false;
+		}
+
+		for (Integer itemId : getDisplayItemIds())
+		{
+			if (bankContainer.contains(itemId))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public ArrayList<Integer> getDisplayItemIds()
+	{
+		if (displayItemId == null)
+		{
+			return getAllIds();
+		}
+
+		return new ArrayList<>(Collections.singletonList(displayItemId));
 	}
 
 	public boolean checkConsideringSlot(Client client)

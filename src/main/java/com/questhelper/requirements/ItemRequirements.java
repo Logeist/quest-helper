@@ -30,12 +30,16 @@ import com.questhelper.steps.conditional.Operation;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import lombok.Getter;
 import net.runelite.api.Client;
 
 public class ItemRequirements extends ItemRequirement
 {
+
+	@Getter
 	ArrayList<ItemRequirement> itemRequirements = new ArrayList<>();
 
+	@Getter
 	LogicType logicType;
 
 	public ItemRequirements(String name, ItemRequirement... itemRequirements)
@@ -64,6 +68,22 @@ public class ItemRequirements extends ItemRequirement
 		for (ItemRequirement itemRequirement : itemRequirements)
 		{
 			if (itemRequirement.checkConsideringSlot(client))
+			{
+				successes++;
+			}
+		}
+		return (successes == itemRequirements.size() && logicType == LogicType.AND)
+			|| (successes > 0 && logicType == LogicType.OR)
+			|| (successes < itemRequirements.size() && logicType == LogicType.NAND)
+			|| (successes == 0 && logicType == LogicType.NOR);
+	}
+
+	public boolean checkBank(Client client)
+	{
+		int successes = 0;
+		for (ItemRequirement itemRequirement : itemRequirements)
+		{
+			if (itemRequirement.checkBank(client))
 			{
 				successes++;
 			}
